@@ -164,6 +164,12 @@ class Scanner {
                             inComment = false;
                         }
                         break;
+                    case '/':
+                        if(peekNext() == '*') { // Nested comment
+                            advance(); advance();
+                            comment(false);
+                        }
+                        break;
                     case '\0':
                         Lox.error(line, "Unterminated block comment.");
                         return;
