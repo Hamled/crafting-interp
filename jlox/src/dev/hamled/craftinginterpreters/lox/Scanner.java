@@ -76,9 +76,8 @@ class Scanner {
 
             // Comments and slashes
             case '/':
-                if(match('/')) {
-                    // A comment goes until the end of the line
-                    while(peek() != '\n' && !isAtEnd()) advance();
+                if(peek() == '/' || peek() == '*') {
+                    comment(match('/'));
                 } else {
                     addToken(TokenType.SLASH);
                 }
@@ -147,6 +146,31 @@ class Scanner {
         // Trim the surrounding quotes.
         String value = source.substring(start + 1, current - 1);
         addToken(TokenType.STRING, value);
+    }
+
+    private void comment(boolean inline) {
+        if(inline) {
+            // An "inline" comment goes until the end of the line
+            while(peek() != '\n' && !isAtEnd()) advance();
+        } else {
+            // A "block" comment goes until the closing '*/'
+            boolean inComment = true;
+            while(inComment) {
+                switch(peek()) {
+                    case '\n': line++; break;
+                    case '*':
+                        if(peekNext() == '/') {
+                            advance(); // Need to consume two chars for terminator
+                            inComment = false;
+                        }
+                        break;
+                    case '\0':
+                        Lox.error(line, "Unterminated block comment.");
+                        return;
+                }
+                advance();
+            }
+        }
     }
 
     private boolean match(char expected) {
