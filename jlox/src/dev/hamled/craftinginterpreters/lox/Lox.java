@@ -51,7 +51,7 @@ public class Lox {
         if(hadError) return;
 
         // Pretty-print the expression tree
-        System.out.println(new AstPrinter().print(expression));
+        System.out.println(new Interpreter().interpret(expression).toString());
     }
 
     static void error(int line, String message) {
