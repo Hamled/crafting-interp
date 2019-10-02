@@ -1,6 +1,7 @@
 package dev.hamled.craftinginterpreters.lox;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.List;
 
 class Parser {
@@ -22,7 +23,25 @@ class Parser {
     }
 
     private Expr expression() {
-        return equality();
+        return sequence();
+    }
+
+    // Sequence of expressions separated by commas
+    private Expr sequence() {
+       Expr expr = equality();
+
+       List<Expr> exprs = new ArrayList<Expr>(1);
+       exprs.add(expr);
+       while(match(TokenType.COMMA)) {
+           Expr next = equality();
+           exprs.add(next);
+       }
+
+       if(exprs.size() > 1) {
+           expr = new Expr.Sequence(exprs);
+       }
+
+       return expr;
     }
 
     private Expr equality() {
