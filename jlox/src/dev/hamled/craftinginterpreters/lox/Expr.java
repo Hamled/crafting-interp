@@ -8,6 +8,7 @@ abstract class Expr {
     R visitGroupingExpr(Grouping expr);
     R visitLiteralExpr(Literal expr);
     R visitUnaryExpr(Unary expr);
+    R visitSequenceExpr(Sequence expr);
   }
   static class Binary extends Expr {
     Binary(Expr left, Token operator, Expr right) {
@@ -54,6 +55,16 @@ abstract class Expr {
 
     final Token operator;
     final Expr right;
+  }
+  static class Sequence extends Expr {
+    Sequence(List<Expr> expressions) {
+        this.expressions = expressions;
+    }
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitSequenceExpr(this);
+    }
+
+    final List<Expr> expressions;
   }
 
   abstract <R> R accept(Visitor<R> visitor);
