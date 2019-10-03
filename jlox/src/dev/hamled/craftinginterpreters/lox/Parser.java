@@ -14,9 +14,14 @@ class Parser {
         this.tokens = tokens;
     }
 
-    Expr parse() {
+    List<Stmt> parse() {
         try {
-            return expression();
+            List<Stmt> statements = new ArrayList<>();
+            while (!isAtEnd()) {
+                statements.add(statement());
+            }
+
+            return statements;
         } catch(ParseError error) {
             return null;
         }
@@ -24,6 +29,25 @@ class Parser {
 
     private Expr expression() {
         return sequence();
+    }
+
+    private Stmt statement() {
+        if(match(TokenType.PRINT)) return printStatement();
+
+        return expressionStatement();
+    }
+
+    private Stmt printStatement() {
+        Expr value = expression();
+        consume(TokenType.SEMICOLON, "Expected ';' after value.");
+        return new Stmt.Print(value);
+    }
+
+    private Stmt expressionStatement() {
+        Expr expr = expression();
+        consume(TokenType.SEMICOLON, "Expected ';' after expression.");
+
+        return new Stmt.Expression(expr);
     }
 
     // Sequence of expressions separated by commas
