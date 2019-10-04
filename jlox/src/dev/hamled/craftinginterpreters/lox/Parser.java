@@ -68,14 +68,32 @@ class Parser {
         return new Stmt.Expression(expr);
     }
 
+    private Expr assignment() {
+        Expr expr = equality();
+
+        if(match(TokenType.EQUAL)) {
+            Token equals = previous();
+            Expr value = assignment();
+
+            if(expr instanceof Expr.Variable) {
+                Token name = ((Expr.Variable)expr).name;
+                return new Expr.Assign(name, value);
+            }
+
+            error(equals, "Invalid assignment target.");
+        }
+
+        return expr;
+    }
+
     // Sequence of expressions separated by commas
     private Expr sequence() {
-       Expr expr = equality();
+       Expr expr = assignment();
 
        List<Expr> exprs = new ArrayList<Expr>(1);
        exprs.add(expr);
        while(match(TokenType.COMMA)) {
-           Expr next = equality();
+           Expr next = assignment();
            exprs.add(next);
        }
 
