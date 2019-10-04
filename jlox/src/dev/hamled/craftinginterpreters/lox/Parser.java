@@ -23,7 +23,7 @@ class Parser {
     }
 
     private Expr expression() {
-        return sequence();
+        return comma();
     }
 
     private Stmt declaration() {
@@ -80,6 +80,18 @@ class Parser {
         return statements;
     }
 
+    private Expr comma() {
+        Expr expr = assignment();
+
+        while(match(TokenType.COMMA)) {
+            Token operator = previous();
+            Expr right = comma();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
     private Expr assignment() {
         Expr expr = equality();
 
@@ -96,24 +108,6 @@ class Parser {
         }
 
         return expr;
-    }
-
-    // Sequence of expressions separated by commas
-    private Expr sequence() {
-       Expr expr = assignment();
-
-       List<Expr> exprs = new ArrayList<Expr>(1);
-       exprs.add(expr);
-       while(match(TokenType.COMMA)) {
-           Expr next = assignment();
-           exprs.add(next);
-       }
-
-       if(exprs.size() > 1) {
-           expr = new Expr.Sequence(exprs);
-       }
-
-       return expr;
     }
 
     private Expr equality() {

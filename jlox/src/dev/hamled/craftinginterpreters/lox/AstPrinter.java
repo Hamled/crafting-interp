@@ -37,12 +37,6 @@ class AstPrinter implements Expr.Visitor<String> {
         return expr.name.lexeme.toString();
     }
 
-    @Override
-    public String visitSequenceExpr(Expr.Sequence expr) {
-        Expr[] exprs = new Expr[expr.expressions.size()];
-        return parenthesize("sequence", expr.expressions.toArray(exprs));
-    }
-
     private String parenthesize(String name, Expr... exprs) {
         StringBuilder builder = new StringBuilder();
 

@@ -119,6 +119,8 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             case STAR:
                 checkNumberOperands(expr.operator, left, right);
                 return (double)left * (double)right;
+            case COMMA:
+                return right;
         }
 
         // Unreachable
@@ -133,21 +135,6 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Object visitLiteralExpr(Expr.Literal expr) {
         return expr.value;
-    }
-
-    @Override
-    public Object visitSequenceExpr(Expr.Sequence expr) {
-        if(expr.expressions.size() == 0) {
-            // Leaving this as a Java exception because getting here is a bug in the parser/interpreter
-            throw new RuntimeException("Sequence expression without any subexpressions.");
-        }
-
-        Object result = null; // Should be okay to initialize as null, because we have at least one assignment
-        for(Expr e : expr.expressions) {
-            result = evaluate(e);
-        }
-
-        return result;
     }
 
     @Override
