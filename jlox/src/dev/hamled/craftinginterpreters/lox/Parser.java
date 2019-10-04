@@ -93,7 +93,7 @@ class Parser {
     }
 
     private Expr assignment() {
-        Expr expr = equality();
+        Expr expr = ternary();
 
         if(match(TokenType.EQUAL)) {
             Token equals = previous();
@@ -105,6 +105,20 @@ class Parser {
             }
 
             error(equals, "Invalid assignment target.");
+        }
+
+        return expr;
+    }
+
+    private Expr ternary() {
+        Expr expr = equality();
+
+        if(match(TokenType.QUESTION)) {
+            Expr trueExpr = assignment();
+            consume(TokenType.COLON, "Expected ':' after true expression in ternary.");
+            Expr falseExpr = assignment();
+
+            expr = new Expr.Ternary(expr, trueExpr, falseExpr);
         }
 
         return expr;
