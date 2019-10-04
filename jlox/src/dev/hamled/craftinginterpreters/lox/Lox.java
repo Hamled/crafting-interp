@@ -53,6 +53,13 @@ public class Lox {
         // Stop if there was a syntax error.
         if(hadError) return;
 
+        /* DEBUG - print AST nodes for all expression statements
+        for(Stmt stmt : statements) {
+            if(stmt instanceof Stmt.Expression) {
+                System.out.println(new AstPrinter().print(((Stmt.Expression) stmt).expression));
+            }
+        }
+        */
         interpeter.interpret(statements);
     }
 
