@@ -9,6 +9,7 @@ class Parser {
 
     private final List<Token> tokens;
     private int current = 0;
+    private int loopDepth = 0;
 
     Parser(List<Token> tokens) {
         this.tokens = tokens;
@@ -44,6 +45,7 @@ class Parser {
         if(match(TokenType.PRINT)) return printStatement();
         if(match(TokenType.WHILE)) return whileStatement();
         if(match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
+        if(match(TokenType.BREAK)) return breakStatement();
 
         return expressionStatement();
     }
@@ -71,7 +73,13 @@ class Parser {
             increment = expression();
         }
         consume(TokenType.RIGHT_PAREN, "Expected ';' after for clauses.");
+
+        loopDepth += 1;
         Stmt body = statement();
+        loopDepth -= 1;
+        if(loopDepth < 0) {
+            throw new RuntimeException("Somehow loop depth was negative.");
+        }
 
         if(increment != null) {
             body = new Stmt.Block(Arrays.asList(
@@ -125,9 +133,26 @@ class Parser {
         consume(TokenType.LEFT_PAREN, "Expected '(' after 'while'.");
         Expr condition = expression();
         consume(TokenType.RIGHT_PAREN, "Expected ')' after condition");
+
+        loopDepth += 1;
         Stmt body = statement();
+        loopDepth -= 1;
+        if(loopDepth < 0) {
+            throw new RuntimeException("Somehow loop depth was negative.");
+        }
 
         return new Stmt.While(condition, body);
+    }
+
+    private Stmt breakStatement() {
+        Stmt.Break stmt = new Stmt.Break(previous());
+        consume(TokenType.SEMICOLON, "Expected ';' after 'break'.");
+
+        if(loopDepth < 1) {
+            error(stmt.keyword, "Break cannot be used outside of a loop statement.");
+        }
+
+        return stmt;
     }
 
     private Stmt expressionStatement() {
