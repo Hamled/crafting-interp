@@ -8,7 +8,8 @@ import java.util.Map;
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     private class BreakExecuted extends RuntimeException {};
 
-    private Environment environment = new Environment();
+    final Environment globals = new Environment();
+    private Environment environment = globals;
 
     void interpret(List<Stmt> statements) {
         try {
@@ -275,5 +276,9 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
 
         return object.toString();
+    }
+
+    private void defineGlobal(String name, Object value) {
+        globals.define(new Token(TokenType.IDENTIFIER, name, null, -1), value);
     }
 }
