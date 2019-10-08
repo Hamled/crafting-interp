@@ -30,7 +30,7 @@ class Parser {
 
     private Stmt declaration() {
         try {
-            if(match(TokenType.FUN)) return function("function");
+            if(match(TokenType.FUN)) return funcOrLambda();
             if(match(TokenType.VAR)) return varDeclaration();
 
             return statement();
@@ -175,24 +175,20 @@ class Parser {
         return new Stmt.Expression(expr);
     }
 
+    private Stmt funcOrLambda() {
+        if(check(TokenType.IDENTIFIER)) {
+            return function("function");
+        }
+
+        Expr expr = lambda();
+        consume(TokenType.SEMICOLON, "Expected ';' after lambda expression.");
+
+        return new Stmt.Expression(expr);
+    }
+
     private Stmt.Function function(String kind) {
         Token name = consume(TokenType.IDENTIFIER, "Expected " + kind + " name.");
-        consume(TokenType.LEFT_PAREN, "Expected '(' after " + kind + " name.");
-        List<Token> parameters = new ArrayList<>();
-        if(!check(TokenType.RIGHT_PAREN)) {
-            do {
-                if(parameters.size() >= 255) {
-                    error(peek(), "Cannot have more than 255 parameters.");
-                }
-
-                parameters.add(consume(TokenType.IDENTIFIER, "Expected parameter name."));
-            } while(match(TokenType.COMMA));
-        }
-        consume(TokenType.RIGHT_PAREN, "Expected ')' after parameters.");
-
-        consume(TokenType.LEFT_BRACE, "Expected '{' before " + kind + " body.");
-        List<Stmt> body = block();
-        return new Stmt.Function(name, parameters, body);
+        return new Stmt.Function(name, lambda());
     }
 
     private List<Stmt> block() {
@@ -376,6 +372,10 @@ class Parser {
             return new Expr.Variable(previous());
         }
 
+        if(match(TokenType.FUN)) {
+            return lambda();
+        }
+
         if(match(TokenType.LEFT_PAREN)) {
             Expr expr = expression();
             consume(TokenType.RIGHT_PAREN, "Expected ')' after expression.");
@@ -383,6 +383,27 @@ class Parser {
         }
 
         throw error(peek(), "Expected expression.");
+    }
+
+    private Expr.Lambda lambda() {
+        Token keyword = previous();
+        consume(TokenType.LEFT_PAREN, "Expected '(' after 'fun'.");
+        List<Token> parameters = new ArrayList<>();
+        if(!check(TokenType.RIGHT_PAREN)) {
+            do {
+                if(parameters.size() >= 255) {
+                    error(peek(), "Cannot have more than 255 parameters.");
+                }
+
+                parameters.add(consume(TokenType.IDENTIFIER, "Expected parameter name."));
+            } while(match(TokenType.COMMA));
+        }
+        consume(TokenType.RIGHT_PAREN, "Expected ')' after parameters.");
+
+        consume(TokenType.LEFT_BRACE, "Expected '{' before function body.");
+        List<Stmt> body = block();
+
+        return new Expr.Lambda(keyword, parameters, body);
     }
 
     private boolean match(TokenType... types) {

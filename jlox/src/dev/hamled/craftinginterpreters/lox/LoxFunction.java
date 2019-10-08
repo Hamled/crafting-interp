@@ -2,38 +2,16 @@ package dev.hamled.craftinginterpreters.lox;
 
 import java.util.List;
 
-class LoxFunction implements LoxCallable {
+class LoxFunction extends LoxLambda {
     private final Stmt.Function declaration;
-    private final Environment closure;
 
     LoxFunction(Stmt.Function declaration, Environment closure) {
+        super(declaration.lambda, closure);
         this.declaration = declaration;
-        this.closure = closure;
     }
 
     @Override
     public String toString() {
         return "<fn " + declaration.name.lexeme + ">";
-    }
-
-    @Override
-    public int arity() {
-        return declaration.params.size();
-    }
-
-    @Override
-    public Object call(Interpreter interpreter, List<Object> arguments) {
-        // Setup a new environment from passed argument values
-        Environment environment = new Environment(closure);
-        for(int i = 0; i < declaration.params.size(); i++) {
-            environment.define(declaration.params.get(i), arguments.get(i));
-        }
-
-        try {
-            interpreter.executeBlock(declaration.body, environment);
-        } catch(Return returnValue) {
-            return returnValue.value;
-        }
-        return null;
     }
 }
