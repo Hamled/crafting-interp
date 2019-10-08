@@ -28,6 +28,21 @@ class AstPrinter implements Expr.Visitor<String> {
     }
 
     @Override
+    public String visitLambdaExpr(Expr.Lambda expr) {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("(λ (");
+        builder.append(expr.params.get(0).lexeme);
+        for(Token param : expr.params.subList(1, expr.params.size())) {
+            builder.append(" ");
+            builder.append(param.lexeme);
+        }
+        builder.append(") ...)");
+
+        return builder.toString();
+    }
+
+    @Override
     public String visitLiteralExpr(Expr.Literal expr) {
        if(expr.value == null) return "nil";
        return expr.value.toString();
