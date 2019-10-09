@@ -60,6 +60,10 @@ public class Lox {
             }
         }
         */
+
+        Resolver resolver = new Resolver(interpeter);
+        resolver.resolve(statements);
+
         interpeter.interpret(statements);
     }
 
