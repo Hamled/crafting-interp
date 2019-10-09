@@ -11,3 +11,22 @@ Maybe it could be implemented with a separate pass through the AST prior to the 
 
 ### Result
 We did implement this as a second pass, but instead of representing the binding as a reference to another AST node, we stored the number environments to walk "up" in the runtime environment chain. This information was then stored on the Interpreter as a map from Expr -> Integer.
+
+### Concerns
+One of the challenges mentioned the idea of implementing the `break` keyword using the same semantic pass that we built for static/lexical variable resolution. We used it to produce a pre-runtime error for using `return` outside of a function, and this would be similar.
+
+However, `break` seems a fair bit more complicated. Consider this example:
+```
+var f;
+while(true) {
+  fun foo() {
+    break;
+  }
+  f = foo;
+  break;
+}
+```
+
+The `break` statement in `foo` should probably not be allowed at all, even if there's some unusual way in which it could work, should `foo` be called within a loop context at runtime.
+
+Instead, we need to know to disallow `break` when it is more closely nested within a function than within a loop.
