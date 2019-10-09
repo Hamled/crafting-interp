@@ -9,3 +9,5 @@ Still, it feels like putting runtime-derived data on the structure which is supp
 
 Maybe it could be implemented with a separate pass through the AST prior to the interpreter's execution. I'm not sure how the binding would be represented in that case, We wouldn't have any environments yet, so we'd either have to create some other structure to represent bindings, and I guess match those up somehow in the interpreter phase? If the binding was from one AST node to another AST node it might work, but I think we'd have to do something messy like referencing the environment on the AST nodes for variable declarations.
 
+### Result
+We did implement this as a second pass, but instead of representing the binding as a reference to another AST node, we stored the number environments to walk "up" in the runtime environment chain. This information was then stored on the Interpreter as a map from Expr -> Integer.
