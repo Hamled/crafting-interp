@@ -43,4 +43,17 @@ class Environment {
     void define(Token name, Object value) {
         values.put(name.lexeme, value);
     }
+
+    Object getAt(int distance, Token name) {
+        return ancestor(distance).values.get(name);
+    }
+
+    Environment ancestor(int distance) {
+        Environment environment = this;
+        for(int i = 0; i < distance; i++) {
+            environment = environment.enclosing;
+        }
+
+        return environment;
+    }
 }
