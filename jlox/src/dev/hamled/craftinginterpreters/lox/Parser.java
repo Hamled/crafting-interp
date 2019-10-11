@@ -401,6 +401,14 @@ class Parser {
             return new Expr.Literal(previous().literal);
         }
 
+        if(match(TokenType.SUPER)) {
+            Token keyword = previous();
+            consume(TokenType.DOT, "Expected '.' after 'super'.");
+            Token method = consume(TokenType.IDENTIFIER,
+                    "Expected superclass method name.");
+            return new Expr.Super(keyword, method);
+        }
+
         if(match(TokenType.THIS)) {
             return new Expr.This(previous());
         }
