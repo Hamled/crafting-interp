@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "debug.h"
+#include "value.h"
 
 void disassembleChunk(Chunk *chunk, const char *name) {
     printf("== %s ==\n", name);
@@ -15,11 +16,23 @@ static size_t simpleInstruction(const char *name, size_t offset) {
     return offset + 1;
 }
 
+static size_t constantInstruction(const char *name, Chunk *chunk,
+                                  size_t offset) {
+    uint8_t constant = chunk->code[offset + 1];
+    printf("%-16s 0x%02hhX '", name, constant);
+    printValue(chunk->constants.values[constant]);
+    puts("'");
+
+    return offset + 2;
+}
+
 size_t disassembleInstruction(Chunk *chunk, size_t offset) {
     printf("%04zd ", offset);
 
     OpCode opcode = (OpCode)chunk->code[offset];
     switch(opcode) {
+        case OP_CONSTANT:
+            return constantInstruction("OP_CONSTANT", chunk, offset);
         case OP_RETURN:
             return simpleInstruction("OP_RETURN", offset);
         default:
