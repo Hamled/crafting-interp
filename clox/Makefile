@@ -9,17 +9,18 @@ CFLAGS=-std=c17
 LDFLAGS=-fuse-ld=lld
 
 
-clox: main.o
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
-OUTPUTS += clox
+SOURCES := $(wildcard *.c)
+OBJS := $(SOURCES:.c=.o)
 
-main.o: main.c
-OUTPUTS += main.o
+clox: $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+
+%.o:
 
 all: clox
 
 clean:
-	rm -f $(OUTPUTS)
+	rm -f clox $(OBJS)
 
 .PHONY: clean
 # end
