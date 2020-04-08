@@ -32,6 +32,11 @@ static size_t constantInstruction(const char *name, Chunk *chunk,
 
 size_t disassembleInstruction(Chunk *chunk, size_t offset) {
     printf("%04zd ", offset);
+    if(offset > 0 && chunk->lines[offset] == chunk->lines[offset - 1]) {
+        printf("   | ");
+    } else {
+        printf("%4d ", chunk->lines[offset]);
+    }
 
     OpCode opcode = (OpCode)chunk->code[offset];
     switch(opcode) {
