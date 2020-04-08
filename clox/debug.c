@@ -20,7 +20,11 @@ static size_t constantInstruction(const char *name, Chunk *chunk,
                                   size_t offset) {
     uint8_t constant = chunk->code[offset + 1];
     printf("%-16s 0x%02hhX '", name, constant);
-    printValue(chunk->constants.values[constant]);
+    if(constant < chunk->constants.count) {
+        printValue(chunk->constants.values[constant]);
+    } else {
+        printf("<MISSING>");
+    }
     puts("'");
 
     return offset + 2;
