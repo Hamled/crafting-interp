@@ -13,4 +13,6 @@ typedef struct {
     uint8_t *code;
 } Chunk;
 
+void initChunk(Chunk *chunk);
+
 #endif // __CLOX_CHUNK_H_
