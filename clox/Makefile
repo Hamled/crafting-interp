@@ -5,7 +5,7 @@
 # @version 0.1
 
 CC=clang
-CFLAGS=-std=c17
+CFLAGS=-std=c17 -Wall -Werror $(EXTRA_CFLAGS)
 LDFLAGS=-fuse-ld=lld
 
 
